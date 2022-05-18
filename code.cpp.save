@@ -1,0 +1,55 @@
+#include <iostream>
+#include "code.h"
+
+int simple_computer::sc_memoryLoad(char* filename){
+	
+
+
+
+}
+
+int simple_computer::sc_memorySave(char* filename){
+        FILE* fp;
+        if((fp = fopen(filename, "w")) == NULL){
+                perror("Error occered while opening file");
+                return 1;
+	}
+        fwrite(mem,sizeof(int),sizeof(mem),fp);
+	fclose(fp);
+	return 0;
+}
+
+
+int simple_computer::sc_memoryGet(int address, int* value){
+        if(address > 99){
+        	out_of_memory = true;
+        	return 1;
+	}
+        else
+        	value = &dram[address];
+	return 0;
+}
+
+
+int simple_computer::sc_memoryInit(){
+        mem = new int[100];
+	for(int i = 0; i < 100; ++i){
+		mem[i] = 0;
+	}
+}
+int simple_computer::sc_memorySet(int address, int value){
+        if(address > 99){
+        	out_of_memory = true;
+        	return 1;
+	}
+        else
+        	dram[address] = value;
+	return 0;
+}
+
+
+int main(){
+
+
+	return 0;
+}

@@ -1,0 +1,155 @@
+#include <iostream>
+#include "code.h"
+#include <string>
+#include "mt.h"
+#include <termios.h>
+#include <sys/ioctl.h>
+
+int mt::mt_clrscr(){
+	std::cout << "\033[H\E[2J" << std::endl;
+	return 0;
+}
+
+int mt::mt_gotoXY(int x, int y){
+	std::cout << "\033[" + std::to_string(x) + std::to_string(y) +  "f" << std::endl;
+	return 0;
+}
+
+int mt::mt_getscreensize(int* rows, int* cols){
+	struct winsize ws;
+	if(!ioctl(1, TIOCGWINSZ, &ws)){
+		*rows = ws.ws_row;
+		*cols = ws.ws_col;
+		return 0;
+	}
+	else return -1;
+}
+
+int mt::mt_setfgcolor(enum colors a){
+	std::cout << "\033[3" + std::to_string(a) + "m" << std::endl;
+	return 0;
+}
+
+int mt::mt_setbgcolor(enum colors a){
+        std::cout << "\033[4" + std::to_string(a) + "m" << std::endl;
+	return 0;
+}
+
+int sc::sc_commandDecode(int value, int* command, int* operand){
+        *command = value  >> 7;
+	if(*command < 10 || *command > 11 && *command < 20 || *command > 21 
+        && *command < 30 || *command > 33 && *command < 40 || *command > 43 
+        && *command < 51){
+		sc_regSet(e,1);
+		return -1;
+	}
+
+	*operand = value - (*command << 7);
+        return 0;
+}
+
+
+int sc::sc_commandEncode(int command, int operand, int* value){
+        if(command < 10 || command > 11 && command < 20 || command > 21 
+        && command < 30 || command > 33 && command < 40 || command > 43 
+        && command < 51)
+                return -1;
+        *value = (command << 7) + operand;
+        return 0;
+}
+
+
+int sc::sc_regGet(int registr, int* value){
+	if(registr < 1 || registr > 5){
+		return -1;
+	}
+	*value = (flags >> (registr - 1)) & 0x1;
+	return 0;
+}
+
+int sc::sc_regSet(int registr, int value){
+	if(value == 1){
+		flags |= (1 << (registr - 1));
+	}
+	else if(value == 0){
+		flags &= ~(1 << (registr - 1));
+	}
+	else{
+		return -1;
+	}
+	return 0;
+}
+
+int sc::sc_regInit(void){
+	flags = 0;
+	return 0;
+}
+
+int sc::sc_memoryLoad(char* filename){
+	FILE* fp;
+	if((fp = fopen(filename,"rb")) == NULL){
+                return -1;
+        }
+        fread(mem,sizeof(int),100,fp);
+        fclose(fp);
+        return 0;
+}
+
+int sc::sc_memorySave(char* filename){
+	FILE* fp;
+	if((fp = fopen(filename,"wb")) == NULL){
+		return -1;
+	}
+	fwrite(mem,sizeof(int),100,fp);
+	fclose(fp);
+	return 0;
+}
+
+int sc::sc_memoryGet(int address, int *value){
+	if(address < 0 || address > 99){
+		sc_regSet(m,1);
+	}
+	else{
+		*value = mem[address];
+	
+	}
+	return 0;
+
+}
+
+
+int sc::sc_memorySet(int address, int value){
+        if(address < 0 || address > 99){
+       		sc_regSet(m, 1);
+	}
+        else
+        	mem[address] = value;
+	return 0;
+}
+
+
+int sc::sc_memoryInit(){
+        mem = new int[100];
+        for(int i = 0; i < 100; ++i){
+                mem[i] = 0;
+	}
+	return 0;
+}
+
+
+
+int main(){
+	mt b;
+	b.mt_clrscr();
+	b.mt_setbgcolor(mt::colors::red);
+	b.mt_setfgcolor(mt::colors::white);
+	
+	int *rows = new int;
+	int *cols = new int;
+	b.mt_getscreensize(rows, cols);
+	b.mt_goto
+	std::cout << "Hi" << std::endl;
+	std::cout << *rows << " " << *cols << std::endl;
+	
+	return 0;
+}

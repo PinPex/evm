@@ -1,0 +1,27 @@
+clear_screen=\E[H\E[2J
+cursor_address=\E[%i%p1%d;%p2%dH
+set_a_background=\E[%?%p1%{8}%<%t4%p1%d%e%p1%{16}%<%t10%p1%{8}%-%d%e48;5;%p1%d%;m
+set_a_foreground=\E[%?%p1%{8}%<%t3%p1%d%e%p1%{16}%<%t9%p1%{8}%-%d%e38;5;%p1%d%;m
+cursor_visible=\E[?12;25h
+cursor_invisible=\E[?25l
+enter_alt_charset_mode=\E(0
+exit_alt_charset_mode=\E(B
+
+00 READ  09    ;(Input A)
+01 READ  10    ;(Input B)
+02 LOAD  09    ;(Load A in accum)
+03 SUB   10    ;(Sub B)
+04 JNEG  07    ;(Jump in 07 if negative)
+05 WRITE 09    ;(Output A)
+06 HALT  00    ;(Stop)
+09 =     +0000 ;(A)
+10 =     +9999 ;(B)
+
+10 INPUT A
+20 LET B = A
+30 LET C = A
+40 LET C = C * (B - 1)
+50 LET B = B - 1
+60 IF B > 1 GOTO 40
+70 PRINT C
+80 END
